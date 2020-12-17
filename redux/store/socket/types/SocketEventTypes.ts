@@ -1,0 +1,8 @@
+export enum ClientSocketEventTypes {
+  NEW_MESSAGE = 'CLIENT/NEW_MESSAGE',
+  READ_MESSAGES = 'CLIENT/READ_MESSAGES'
+}
+export enum ServerSocketEventTypes {
+  NEW_MESSAGE = 'SERVER/NEW_MESSAGE',
+  READ_MESSAGES = 'SERVER/READ_MESSAGES'
+}

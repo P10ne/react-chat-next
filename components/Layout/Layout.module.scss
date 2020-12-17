@@ -1,0 +1,25 @@
+.Layout {
+  height: 100vh;
+  overflow: hidden;
+  padding: 20px;
+  &_type {
+    &_page {
+      .Layout__wrapper {
+        max-width: 1200px;
+        width: 100%;
+      }
+    }
+    &_form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .Layout__wrapper {
+        max-width: 500px;
+      }
+    }
+  }
+  &__wrapper {
+    margin: 0 auto;
+    overflow: hidden;
+  }
+}

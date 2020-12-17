@@ -1,0 +1,10 @@
+.Chat {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  border: 1px solid gray;
+  border-radius: 8px;
+  overflow: auto;
+  height: calc(100vh - 200px);
+  padding: 8px 0;
+}
