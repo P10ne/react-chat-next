@@ -17,5 +17,4 @@ export const getTokensFromCookie = (cookie: string): Tokens => {
     refreshToken: refreshToken!,
     accessToken
   }
-
 };

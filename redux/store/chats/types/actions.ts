@@ -8,6 +8,8 @@ import {
 import {Chats} from "./Chats";
 import {Chat} from "./Chat";
 import {Tokens} from "../../../types/Tokens";
+import {NextApiRequest} from "next";
+import {GetServerSidePropsContext} from "next-redux-wrapper";
 
 export enum ActionType {
   START_LOADING = `CHATS/START_LOADING`,
@@ -27,7 +29,7 @@ export type SetChatsAction = SetDataAction<ActionType.SET_DATA, Chats>;
 export type SetChatsFetchErrorAction = SetFetchingErrorAction<ActionType.SET_ERROR>;
 export type FetchChatsPayload = {
   searchQuery?: string;
-  tokens?: Tokens
+  ctx?: GetServerSidePropsContext,
 }
 export type FetchChatsAction = FetchAction<ActionType.FETCH, FetchChatsPayload>;
 

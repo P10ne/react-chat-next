@@ -26,7 +26,6 @@ function* watchInputSocketEvents(socket: Socket) {
           yield put(markAsRead({messages: event.payload.messages}));
           break;
       }
-      console.log('Сокет соыбтие: ', event);
     } catch(err) {
       console.error('socket error:', err);
       // socketChannel is still open in catch block
@@ -42,12 +41,13 @@ function* watchOutputSocketEvents(socket: Socket) {
 
 export function* socketWatcher() {
   yield takeEvery(AuthActionType.SET_AUTH_STATUS, function* ({payload: {isLogined}}: SetAuthStatusAction) {
-    if (isLogined) {
-      const profileData = yield select(profileDataSelector);
-      const socket = yield call(createWebSocketConnection, profileData);
-      yield fork(watchInputSocketEvents, socket);
-      yield fork(watchOutputSocketEvents, socket);
-    }
+    // if (isLogined) {
+    //   const profileData = yield select(profileDataSelector);
+    //   const socket = yield call(createWebSocketConnection, profileData);
+    //   yield fork(watchInputSocketEvents, socket);
+    //   yield fork(watchOutputSocketEvents, socket);
+    // }
+    // todo socket watcher
   })
 
 }

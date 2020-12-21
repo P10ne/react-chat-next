@@ -1,5 +1,5 @@
 import axios, {AxiosResponse} from 'axios';
-import {put} from 'redux-saga/effects';
+import {put, putResolve, select} from 'redux-saga/effects';
 import {AccessToken} from "../types/AccessToken";
 import {getAccessToken, getRefreshToken, setAccessToken, setRefreshToken} from "./tokens";
 import API from "../../constants/api";
@@ -7,6 +7,10 @@ import {getFingerPrint} from "./fingerPrint";
 import {RefreshToken} from "../types/RefreshToken";
 import {logout} from "../store/auth/actions";
 import {Tokens} from "../types/Tokens";
+import {isLoginedSelector} from "../store/auth/selectors";
+import {fetchProfile} from "../store/profile/actions";
+import {NextApiRequest} from "next";
+import {GetServerSidePropsContext} from "next-redux-wrapper";
 
 // todo типизация методов, обработка ошибок
 
@@ -23,7 +27,8 @@ type RequestArgs = {
   url: string;
   body?: Object;
   headers?: Object;
-  tokens?: Tokens
+  ctx?: GetServerSidePropsContext,
+  meta?: any
 }
 type ActionArgs = {
   startFetchingAction?: any,
@@ -33,7 +38,11 @@ type ActionArgs = {
 }
 
 export function* sendRequest(requestArgs: RequestArgs, actionArgs: ActionArgs) {
-  const {method, url, body, headers, tokens} = requestArgs;
+  const isLogined = yield select(isLoginedSelector);
+  const {method, url, body, headers, ctx, meta} = requestArgs;
+  if (!isLogined) {
+    yield putResolve(fetchProfile({ctx}));
+  }
   const {startFetchingAction, stopFetchingAction, setDataAction} = actionArgs;
   if (startFetchingAction) {yield put(startFetchingAction())}
   try {
@@ -42,41 +51,57 @@ export function* sendRequest(requestArgs: RequestArgs, actionArgs: ActionArgs) {
       url,
       body,
       headers,
-      tokens
+      ctx
     });
     yield put(setDataAction(response.data));
   } catch (e) {
     console.error('Request error');
   } finally {
-    if (stopFetchingAction) {yield put(stopFetchingAction())}
+    if (stopFetchingAction) {yield put(stopFetchingAction(meta))}
   }
 }
 
-function* sendAuthorizedRequest(args: RequestArgs): any {
-  const TIME_BEFORE_TOKEN_EXPIRED = 10000;
-  const {method, url, body, headers, tokens} = args;
-  const accessToken = tokens?.accessToken || getAccessToken();
-  const refreshToken = tokens?.refreshToken || getRefreshToken();
-  const tokenExpiresAt = accessToken.expiresAt;
-  const isTokenExpired = Date.now() > tokenExpiresAt - TIME_BEFORE_TOKEN_EXPIRED;
-  console.log('expired', isTokenExpired);
-  if (!isTokenExpired) {
-    return yield makeRequest({
-      method,
-      url,
-      body,
-      // @ts-ignore
-      headers: {
-        ...headers,
-        'Authorization': `Bearer ${accessToken.token}`
-      }
-    })
-  } else {
-    const success = yield refresh(refreshToken);
-    console.log('success', success);
-    if (success) {
-      return yield sendAuthorizedRequest(args);
+
+/*
+ tokens - передается при вызове метода из refresh - содержит новые токены
+ */
+export function* sendAuthorizedRequest(args: RequestArgs, tokens?: Tokens): any {
+
+  function* refreshAndSend(refreshToken: RefreshToken, ctx?: GetServerSidePropsContext) {
+    const tokens = yield refresh(ctx, refreshToken);
+    if (tokens) {
+      return yield sendAuthorizedRequest(args, tokens);
     }
+  }
+
+  const TIME_BEFORE_TOKEN_EXPIRED = 10000;
+  const {method, url, body, headers, ctx} = args;
+  const accessToken = tokens?.accessToken || getAccessToken(ctx);
+  const refreshToken = tokens?.refreshToken || getRefreshToken(ctx);
+
+  if (refreshToken) {
+    if (!accessToken) {
+      return yield refreshAndSend(refreshToken, ctx);
+    } else {
+      const tokenExpiresAt = accessToken.expiresAt;
+      const isTokenExpired = Date.now() > tokenExpiresAt - TIME_BEFORE_TOKEN_EXPIRED;
+      if (!isTokenExpired) {
+        return yield makeRequest({
+          method,
+          url,
+          body,
+          // @ts-ignore
+          headers: {
+            ...headers,
+            'Authorization': `Bearer ${accessToken.token}`
+          }
+        })
+      } else {
+        return yield refreshAndSend(refreshToken, ctx);
+      }
+    }
+  } else {
+    return yield refreshAndSend(refreshToken, ctx);
   }
 }
 
@@ -86,7 +111,6 @@ export async function sendUnauthorizedRequest(args: RequestArgs) {
 
 async function makeRequest(args: RequestArgs) {
   const {method, url, body, headers} = args;
-  console.log('some', args);
   const result = await axios.request({
     method,
     url,
@@ -104,7 +128,7 @@ type RefreshResponse = {
   refreshToken: RefreshToken
 }
 
-export function* refresh(refreshToken: RefreshToken) {
+export function* refresh(ctx: GetServerSidePropsContext | undefined, refreshToken: RefreshToken) {
   const fingerPrint = yield getFingerPrint();
   const requestBody: {refreshToken: string, fingerPrint: string} = {
     refreshToken: refreshToken,
@@ -120,17 +144,17 @@ export function* refresh(refreshToken: RefreshToken) {
   } catch (e) {console.error('refresh error: ', response);}
 
   const refreshResponse = response as AxiosResponse<RefreshResponse>;
-  console.log('1', response);
   if (refreshResponse.status === 401) {
-    console.log('2');
     yield put(logout());
-    return false;
+    return null;
   } else {
-    console.log('3');
     const {accessToken, refreshToken} = refreshResponse.data;
-    setAccessToken(accessToken);
-    setRefreshToken(refreshToken);
-    return true;
+    setAccessToken(ctx, accessToken);
+    setRefreshToken(ctx, refreshToken);
+    return {
+      accessToken,
+      refreshToken
+    };
   }
 }
 

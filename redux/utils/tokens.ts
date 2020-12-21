@@ -1,42 +1,47 @@
 import {AccessToken} from "../types/AccessToken";
 import {LOCAL_STORAGE_KEYS} from "../../constants/localStorageKeys";
 import {RefreshToken} from "../types/RefreshToken";
-import {Cookies} from 'react-cookie';
+import {Cookies as ReactCookies} from 'react-cookie';
+import { parseCookies, setCookie, destroyCookie } from 'nookies'
 
-const cookies = new Cookies();
+import {GetServerSidePropsContext} from "next-redux-wrapper";
 
-export function getAccessToken(): AccessToken {
-  const stringTokenObject = cookies.get(LOCAL_STORAGE_KEYS.accessToken);
-  try {
-    if (stringTokenObject) {
-      const token: AccessToken = stringTokenObject;
-      return token;
-    }
-    return {
-      expiresAt: 0,
-      token: ''
-    }
-  } catch (e) {
-    // todo Обработка ошибки получения токена
-    console.error('Ошибка при получении токена из localStorage');
-    return {
-      expiresAt: 0,
-      token: ''
-    }
+const reactCookies = new ReactCookies();
+
+export function getAccessToken(ctx: GetServerSidePropsContext | undefined): AccessToken {
+  if (ctx) {
+    const cookies = parseCookies(ctx);
+    const tokenObj = cookies?.accessToken && JSON.parse(cookies.accessToken);
+    return tokenObj;
+  } else {
+    const stringTokenObject = reactCookies.get(LOCAL_STORAGE_KEYS.accessToken);
+    return stringTokenObject;
   }
 }
-export function setAccessToken(token: AccessToken): void {
-  cookies.set(LOCAL_STORAGE_KEYS.accessToken, token);
+export function setAccessToken(ctx: GetServerSidePropsContext | undefined, token: AccessToken): void {
+  setCookie(ctx, LOCAL_STORAGE_KEYS.accessToken, JSON.stringify(token), {
+    maxAge: 15 * 60,
+    path: '/'
+  });
 }
-export function getRefreshToken(): string {
-  const token = cookies.get(LOCAL_STORAGE_KEYS.refreshToken);
-  return token || '';
+export function getRefreshToken(ctx: GetServerSidePropsContext | undefined): string {
+  if (ctx) {
+    const cookies = parseCookies(ctx);
+    const refreshToken = cookies?.refreshToken;
+    return refreshToken;
+  } else {
+    const token = reactCookies.get(LOCAL_STORAGE_KEYS.refreshToken);
+    return token || '';
+  }
 }
-export function setRefreshToken(token: RefreshToken): void {
-  cookies.set(LOCAL_STORAGE_KEYS.refreshToken, token);
+export function setRefreshToken(ctx: GetServerSidePropsContext | undefined, token: RefreshToken): void {
+  setCookie(ctx, LOCAL_STORAGE_KEYS.refreshToken, token, {
+    maxAge: 30 * 24 * 60 * 60,
+    path: '/'
+  });
 }
 
 export function clearTokens(): void {
-  cookies.remove(LOCAL_STORAGE_KEYS.accessToken);
-  cookies.remove(LOCAL_STORAGE_KEYS.refreshToken);
+  reactCookies.remove(LOCAL_STORAGE_KEYS.accessToken);
+  reactCookies.remove(LOCAL_STORAGE_KEYS.refreshToken);
 }

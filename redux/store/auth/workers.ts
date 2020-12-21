@@ -27,14 +27,10 @@ export function* login({payload: {login, password}}: LoginFetchAction) {
       body: {login, password, fingerPrint}
     });
     const {accessToken, refreshToken} = response.data as LoginResponse;
-    setAccessToken(accessToken);
-    setRefreshToken(refreshToken);
+    setAccessToken(undefined, accessToken);
+    setRefreshToken(undefined, refreshToken);
 
-
-    console.log('refresh: ', getRefreshToken());
-    console.log('access: ', getAccessToken());
-
-    yield getProfile();
+    // yield getProfile();
     yield put(setAuthStatus({isLogined: true}));
   } catch (e) {
     console.error(e);
@@ -44,7 +40,6 @@ export function* login({payload: {login, password}}: LoginFetchAction) {
 }
 
 export function* logout() {
-  console.log('logout');
   clearTokens();
   yield put(setAuthStatus({isLogined: false}));
 }
