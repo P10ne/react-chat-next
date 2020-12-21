@@ -20,10 +20,14 @@ export const setError = (error: HttpError): SetProfileFetchErrorAction => ({
 export const startLoading = (): StartFetchingProfileAction => ({
   type: ActionType.START_LOADING
 });
-export const stopLoading = (): StopFetchingProfileAction => ({
-  type: ActionType.STOP_LOADING
+export const stopLoading = (meta: any): StopFetchingProfileAction => ({
+  type: ActionType.STOP_LOADING,
+  meta
 });
-export const fetchProfile = (): Omit<FetchProfileAction, 'payload'>  => ({
-  type: ActionType.FETCH
+// todo data: any
+export const fetchProfile = (data: any): Omit<FetchProfileAction, 'payload'>  => ({
+  type: ActionType.FETCH,
+  ctx: data.ctx,
+  meta: {thunk: true}
 });
 

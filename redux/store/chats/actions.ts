@@ -28,15 +28,19 @@ export const setError = (error: HttpError): SetChatsFetchErrorAction => ({
 export const startLoading = (): StartFetchingChatsAction => ({
   type: ActionType.START_LOADING
 });
-export const stopLoading = (): StopFetchingChatsAction => ({
-  type: ActionType.STOP_LOADING
+export const stopLoading = (meta: any): StopFetchingChatsAction => ({
+  type: ActionType.STOP_LOADING,
+  meta
 });
-export const fetchChats = ({searchQuery, tokens}: FetchChatsPayload = {}): FetchChatsAction => ({
+export const fetchChats = ({searchQuery, ctx}: FetchChatsPayload = {}): FetchChatsAction => ({
   type: ActionType.FETCH,
   payload: {
     searchQuery
   },
-  tokens
+  ctx,
+  meta: {
+    thunk: true
+  }
 });
 export const setSelectedChat = (chat: SetSelectedChatPayload): SetSelectedChatAction => ({
   type: ActionType.SET_SELECTED,

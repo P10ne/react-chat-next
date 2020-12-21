@@ -42,12 +42,13 @@ function* watchOutputSocketEvents(socket: Socket) {
 
 export function* socketWatcher() {
   yield takeEvery(AuthActionType.SET_AUTH_STATUS, function* ({payload: {isLogined}}: SetAuthStatusAction) {
-    if (isLogined) {
-      const profileData = yield select(profileDataSelector);
-      const socket = yield call(createWebSocketConnection, profileData);
-      yield fork(watchInputSocketEvents, socket);
-      yield fork(watchOutputSocketEvents, socket);
-    }
+    // if (isLogined) {
+    //   const profileData = yield select(profileDataSelector);
+    //   const socket = yield call(createWebSocketConnection, profileData);
+    //   yield fork(watchInputSocketEvents, socket);
+    //   yield fork(watchOutputSocketEvents, socket);
+    // }
+    // todo socket watcher
   })
 
 }

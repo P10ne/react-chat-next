@@ -1,4 +1,5 @@
 import {FC, useEffect} from "react";
+import Link from 'next/link';
 import {Row, Col, Card, Input} from 'antd';
 import {block} from 'bem-cn';
 import Layout from "../components/Layout/Layout";
@@ -75,18 +76,11 @@ const MainPage: FC<MainPageProps> = () => {
   )
 };
 
-export const getServerSideProps = wrapper.getServerSideProps(async ({req: {headers: {cookie}}, store}) => {
+export const getServerSideProps = wrapper.getServerSideProps(async (ctx) => {
+  const {store} = ctx;
   console.log('await start');
-  const tokens = getTokensFromCookie(cookie!);
   // @ts-ignore
-  store.dispatch(fetchChats({tokens}));
-  // @ts-ignore
-  // await store.sagaTask.toPromise();
-  await new Promise(res => {
-    setTimeout(() => {
-      res(null);
-    }, 5000);
-  });
+  await store.dispatch(fetchChats({ctx}));
   console.log('await end');
 });
 

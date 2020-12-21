@@ -2,12 +2,15 @@ import {HttpError} from "./HttpError";
 import {AccessToken} from "./AccessToken";
 import {RefreshToken} from "./RefreshToken";
 import {Tokens} from "./Tokens";
+import {NextApiRequest} from "next";
+import {GetServerSidePropsContext} from "next-redux-wrapper";
 
 export type StartFetchingAction<T> = {
   type: T;
 };
 export type StopFetchingAction<T> = {
   type: T;
+  meta: any
 };
 export type SetDataAction<T, U> = {
   type: T;
@@ -20,5 +23,6 @@ export type SetFetchingErrorAction<T, U = HttpError> = {
 export type FetchAction<T, U = any> = {
   type: T;
   payload: U;
-  tokens?: Tokens
+  ctx?: GetServerSidePropsContext,
+  meta?: {thunk: boolean}
 };

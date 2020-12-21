@@ -3,12 +3,14 @@ import {RequestMethod, sendRequest} from "../../utils/request";
 import API from "../../../constants/api";
 import {startLoading, stopLoading, setData, setError} from './actions';
 
-export function* getChats({payload: {searchQuery}, tokens}: FetchChatsAction) {
+export function* getChats({payload: {searchQuery}, ctx, meta}: FetchChatsAction) {
+  console.log('fetch chats');
   yield sendRequest(
     {
       method: RequestMethod.POST,
       url: API.CHATS,
-      tokens
+      ctx,
+      meta
     },
     {
       startFetchingAction: startLoading,
@@ -16,4 +18,5 @@ export function* getChats({payload: {searchQuery}, tokens}: FetchChatsAction) {
       setDataAction: setData,
       setFetchingErrorAction: setError
   });
+  console.log('end fetch chats');
 }
