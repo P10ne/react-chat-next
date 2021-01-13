@@ -3,15 +3,19 @@ import {Skeleton} from 'antd';
 import {block} from 'bem-cn';
 import List from "../List";
 import UsersListItem from "../UsersListItem";
-// import './UsersList.scss';
 import {useDispatch, useSelector} from "react-redux";
 import {Chat} from "../../redux/store/chats/types/Chat";
 import {setSelectedChat} from "../../redux/store/chats/actions";
 import {activeChatSelector, chatsSelector} from "../../redux/store/chats/selectors";
 import {fetchMessages} from "../../redux/store/messages/actions";
+import styled from "styled-components";
 
-const cn = block('UsersList');
 type UsersListProps = {};
+
+const StyledList = styled(List)`
+  overflow: auto;
+  height: calc(100vh - 150px);
+`;
 
 const UsersList: FC<UsersListProps> = () => {
   const dispatch = useDispatch();
@@ -24,8 +28,7 @@ const UsersList: FC<UsersListProps> = () => {
   };
 
   const chatListNode =
-    <List
-      className={cn()}
+    <StyledList
       renderItem={(item: Chat) => (
         <UsersListItem
           name={item.name}

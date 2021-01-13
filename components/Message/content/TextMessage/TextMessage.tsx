@@ -1,18 +1,17 @@
 import {FC} from "react";
-// import './TextMessage.scss';
-import {block} from "bem-cn";
+import styled from "styled-components";
 
 type TextMessageProps = {
   text: string;
 };
 
-const cn = block('TextMessage');
+const StyledTextMessage = styled.span`
+  background-color: white;
+`;
 
 const TextMessage: FC<TextMessageProps> = ({text}) => {
   return (
-    <span className={cn()}>
-      {text}
-    </span>
+    <StyledTextMessage>{text}</StyledTextMessage>
   )
 };
 

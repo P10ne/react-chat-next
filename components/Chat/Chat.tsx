@@ -13,6 +13,7 @@ import {readMessages} from "../../redux/store/socket/actions";
 import {activeChatSelector} from "../../redux/store/chats/selectors";
 import {resetUnreadCount} from "../../redux/store/chats/actions";
 import {User} from "../../redux/types/User";
+import styled from "styled-components";
 
 type ChatProps = {};
 type PreparedMessage = {
@@ -27,6 +28,17 @@ type PreparedMessage = {
 }
 
 const cn = block('Chat');
+
+const StyledChat = styled.section`
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  border: 1px solid gray;
+  border-radius: 8px;
+  overflow: auto;
+  height: calc(100vh - 200px);
+  padding: 8px 0;
+`;
 
 const Chat: FC<ChatProps> = () => {
   const {data, loading, error} = useSelector(messagesSelector);
@@ -99,8 +111,7 @@ const Chat: FC<ChatProps> = () => {
   const errorNode = <p>Ошибка</p>;
 
   return (
-    <section
-      className={cn()}
+    <StyledChat
       ref={ref}
     >
       {
@@ -110,7 +121,7 @@ const Chat: FC<ChatProps> = () => {
           ? errorNode
           : loadingNode
       }
-    </section>
+    </StyledChat>
   );
 };
 

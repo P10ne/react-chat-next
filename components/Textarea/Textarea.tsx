@@ -1,16 +1,13 @@
 import {FC} from "react";
 import {Input as AntdInput} from 'antd';
+const {TextArea: AntdTextarea} = AntdInput;
 import {TextAreaProps} from 'antd/lib/input/TextArea';
-import {block} from 'bem-cn';
 
 type TextareaProps = {} & TextAreaProps;
-const cn = block('Textarea');
-const {TextArea: AntdTextarea} = AntdInput;
 
-const Textarea:FC<TextareaProps> = ({className, ...props}) => {
+const Textarea:FC<TextareaProps> = ({...props}) => {
   return (
     <AntdTextarea
-      className={`${cn()} ${className}`}
       {...props}
     />
   )
