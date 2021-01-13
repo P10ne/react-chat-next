@@ -3,7 +3,6 @@ import {createSocketChannel, createWebSocketConnection} from "./utils";
 import {outputEventsWorker, takeMessage} from "./workers";
 import {ServerSocketEventTypes} from "./types/SocketEventTypes";
 import {ServerSocketEvents} from "./types/SocketEvents";
-import {setSocket} from "./actions";
 import {ActionType} from "./types/actions";
 import {ActionType as AuthActionType, SetAuthStatusAction, SetAuthStatusActionPayload} from '../auth/types/actions';
 import {Socket} from "socket.io-client";
@@ -11,7 +10,6 @@ import {profileDataSelector} from "../profile/selectors";
 import {markAsRead} from "../messages/actions";
 
 function* watchInputSocketEvents(socket: Socket) {
-  yield put(setSocket(socket));
   const socketChannel = yield call(createSocketChannel, socket);
 
   while (true) {
@@ -40,14 +38,11 @@ function* watchOutputSocketEvents(socket: Socket) {
 }
 
 export function* socketWatcher() {
-  yield takeEvery(AuthActionType.SET_AUTH_STATUS, function* ({payload: {isLogined}}: SetAuthStatusAction) {
-    // if (isLogined) {
-    //   const profileData = yield select(profileDataSelector);
-    //   const socket = yield call(createWebSocketConnection, profileData);
-    //   yield fork(watchInputSocketEvents, socket);
-    //   yield fork(watchOutputSocketEvents, socket);
-    // }
-    // todo socket watcher
+  yield takeEvery(ActionType.CONNECT, function* () {
+    const profileData = yield select(profileDataSelector);
+    const socket = yield call(createWebSocketConnection, profileData);
+    yield fork(watchInputSocketEvents, socket);
+    yield fork(watchOutputSocketEvents, socket);
   })
 
 }

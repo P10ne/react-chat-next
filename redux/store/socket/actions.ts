@@ -1,12 +1,7 @@
-import {ActionType, EmitSocketAction, SetSocketAction} from "./types/actions";
-import {SocketData} from "./reducer";
+import {ActionType, EmitSocketAction} from "./types/actions";
 import {ClientSocketEventTypes} from "./types/SocketEventTypes";
 import {NewMessageEvent, ReadMessagesPayload} from "./types/NewMessageEvent";
-
-export const setSocket = (socket: SocketData): SetSocketAction => ({
-  type: ActionType.SET_DATA,
-  payload: socket
-});
+import {Action} from "redux";
 
 export const sendMessage = (message: NewMessageEvent): EmitSocketAction => ({
   type: ActionType.EMIT,
@@ -22,4 +17,8 @@ export const readMessages = (payload: ReadMessagesPayload): EmitSocketAction => 
     type: ClientSocketEventTypes.READ_MESSAGES,
     payload
   }
+});
+
+export const connectSocket = (): Action => ({
+  type: ActionType.CONNECT
 });

@@ -15,6 +15,7 @@ import {activeChatSelector, chatsSelector} from "../redux/store/chats/selectors"
 import {wrapper} from "../redux";
 import {getAccessToken, getRefreshToken} from "../redux/utils/tokens";
 import {getTokensFromCookie} from "../redux/utils/getTokensFromCookie";
+import {connectSocket} from "../redux/store/socket/actions";
 
 type MainPageProps = {};
 
@@ -24,6 +25,10 @@ const MainPage: FC<MainPageProps> = () => {
   const dispatch = useDispatch();
   const chats = useSelector(chatsSelector);
   const activeChat = useSelector(activeChatSelector);
+
+  useEffect(() => {
+    dispatch(connectSocket());
+  }, [dispatch]);
 
   useEffect(() => {
     if (!chats) {
