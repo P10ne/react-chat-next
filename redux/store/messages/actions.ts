@@ -37,8 +37,9 @@ export const setError = (error: HttpError): SetMessagesFetchErrorAction => ({
 export const startLoading = (): StartFetchingMessagesAction => ({
   type: ActionType.START_LOADING
 });
-export const stopLoading = (): StopFetchingMessagesAction => ({
-  type: ActionType.STOP_LOADING
+export const stopLoading = (meta: any): StopFetchingMessagesAction => ({
+  type: ActionType.STOP_LOADING,
+  meta
 });
 export const fetchMessages = ({chatId}: FetchMessagesPayload): FetchMessagesAction => ({
   type: ActionType.FETCH,

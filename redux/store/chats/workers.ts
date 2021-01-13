@@ -4,7 +4,6 @@ import API from "../../../constants/api";
 import {startLoading, stopLoading, setData, setError} from './actions';
 
 export function* getChats({payload: {searchQuery}, ctx, meta}: FetchChatsAction) {
-  console.log('fetch chats');
   yield sendRequest(
     {
       method: RequestMethod.POST,
