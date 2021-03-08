@@ -7,6 +7,6 @@ export const config = {
 }
 
 export default createProxyMiddleware({
-  target: 'http://localhost:4000/',
+  target: 'http://172.16.3.13:4000/',
   changeOrigin: true
 });
